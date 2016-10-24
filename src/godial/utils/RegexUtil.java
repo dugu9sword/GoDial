@@ -53,7 +53,6 @@ public class RegexUtil {
         Matcher matcher=Pattern.compile(regexmain).matcher(word);
         if(matcher.find()) {
             String extracted=matcher.group();
-            System.out.println("extracted is "+extracted);
             for (int i = 0; i < regexslot.length; i++) {
                 Matcher slotmatcher=Pattern.compile(regexslot[i][1]).matcher(extracted);
 //                log.info(regexslot[i][1]);

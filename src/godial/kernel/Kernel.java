@@ -41,7 +41,7 @@ public class Kernel implements IKernel {
             switch (actUnit.actType){
                 case INFORM:
                     log.info("System act will fill in "+actUnit.slot+" with "+actUnit.value);
-
+                    systemAct.getContext().setSlot(actUnit.slot,actUnit.value);
                     break;
             }
         }
@@ -55,6 +55,7 @@ public class Kernel implements IKernel {
     public SystemAct react(UserAct userAct) {
         ArrayList<ActUnit> actUnits=userAct.getActUnits();
         SystemAct systemAct=new SystemAct();
+        systemAct.setContext(userAct.getContext());
         for(ActUnit actUnit:actUnits){
             switch (actUnit.actType){
                 case INFORM:

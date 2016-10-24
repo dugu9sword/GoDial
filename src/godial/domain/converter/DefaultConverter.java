@@ -29,10 +29,11 @@ public class DefaultConverter extends AbstractConverter {
                 ActUnit actUnit=new ActUnit();
                 actUnit.actType= ActType.INFORM;
                 actUnit.slot=dialElement.slot;
-                actUnit.value=map.get(dialElement.slot);
+                actUnit.value=map.toString();
                 userAct.addActUnit(actUnit);
             }
         }
+        userAct.setContext(getDomain().getContext());
         if(userAct.getActUnits().isEmpty())
             return UserAct.NONE;
         else

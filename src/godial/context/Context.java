@@ -12,9 +12,9 @@ import java.util.ArrayList;
  */
 public class Context {
 
-    static Log log= LogFactory.getLog(Context.class);
+    static Log log = LogFactory.getLog(Context.class);
 
-    private static final String UNFILLED="!@#$%^&*()";
+    private static final String UNFILLED = "!@#$%^&*()";
 
     private ArrayList<String> values;
 
@@ -24,39 +24,40 @@ public class Context {
 
     public void setDialStructure(DialStructure dialStructure) {
         this.dialStructure = dialStructure;
-        values=new ArrayList<>();
-        for(int i=0;i<dialStructure.getDialElements().size();i++)
+        values = new ArrayList<>();
+        for (int i = 0; i < dialStructure.getDialElements().size(); i++)
             values.add(UNFILLED);
     }
 
     private DialStructure dialStructure;
 
-    public void setSlot(String slot,String value){
+    public void setSlot(String slot, String value) {
         int index;
-        for(index=0;index<dialStructure.getDialElements().size();index++)
-            if(dialStructure.getDialElements().get(index).slot.equals(slot))
-            {
-                values.set(index,value);
+        for (index = 0; index < dialStructure.getDialElements().size(); index++)
+            if (dialStructure.getDialElements().get(index).slot.equals(slot)) {
+                values.set(index, value);
             }
     }
 
-    public boolean allSlotFilled(){
-        boolean filled=false;
-        for(int index=0;index<values.size();index++)
-            if(values.get(index).equals(UNFILLED))
-                filled=false;
-        log.info(filled);
+    public boolean allSlotFilled() {
+        boolean filled = true;
+        for (int index = 0; index < values.size(); index++)
+            if (values.get(index).equals(UNFILLED))
+                filled = false;
         return filled;
     }
 
-    public String nextUnfilledSlot(){
+    public String nextUnfilledSlot() {
         int index;
-        for(index=0;index<values.size();index++)
-            if(values.get(index).equals(UNFILLED))
+        for (index = 0; index < values.size(); index++)
+            if (values.get(index).equals(UNFILLED))
                 break;
         return dialStructure.getDialElements().get(index).slot;
     }
 
+    public ArrayList<String> getValues(){
+        return values;
+    }
 
 
 }

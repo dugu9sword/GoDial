@@ -1,5 +1,7 @@
 package godial.act;
 
+import godial.context.Context;
+
 import java.util.ArrayList;
 
 /**
@@ -7,6 +9,8 @@ import java.util.ArrayList;
  */
 public class AbstractAct {
     private ArrayList<ActUnit> actUnits;
+
+    private Context context;
 
     public AbstractAct(){
         actUnits=new ArrayList<>();
@@ -18,5 +22,13 @@ public class AbstractAct {
 
     public ArrayList<ActUnit> getActUnits(){
         return actUnits;
+    }
+
+    public void setContext(Context context){
+        this.context=context;
+    }
+
+    public Context getContext(){
+        return context;
     }
 }
