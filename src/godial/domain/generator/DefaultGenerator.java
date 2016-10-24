@@ -2,26 +2,33 @@ package godial.domain.generator;
 
 import godial.act.SystemAct;
 import godial.dialstructure.DialElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Generator a response by simply asking "What is the {slot}?".
- *
- *
+ * <p>
+ * <p>
  * Created by zhouyi on 16-10-23.
  */
-public class DefaultGenerator extends AbstractGenerator{
-    public String generate(SystemAct systemAct){
-        if(getDomain().getContext().allSlotFilled()){
-            String s= "OK! I will do that for you.\n";
-            ArrayList<DialElement> dialElements=getDomain().getContext().getDialStructure().getDialElements();
-            for(int i=0;i<dialElements.size();i++)
-                s+=dialElements.get(i).slot+"\t"+getDomain().getContext().getValues().get(i)+"\n";
-            s+="Thank you.";
+public class DefaultGenerator extends AbstractGenerator {
+    static Log log= LogFactory.getLog(DefaultGenerator.class);
+
+    public String generate(SystemAct systemAct) {
+        log.info("Next unfilled Slot is "+getDomain().correspondingContext().nextUnfilledSlot());
+        if (getDomain().correspondingContext().nextUnfilledSlot() == null) {
+            String s = "OK! I will do that for you.\n";
+            ArrayList<DialElement> dialElements = getDomain().getDialStructure().getDialElements();
+            HashMap<String,String> values=getDomain().correspondingContext().getValues();
+            for (DialElement dialElement:dialElements)
+                s += dialElement.slot + "\t" + values.get(dialElement.slot) + "\n";
+            s += "Anything else?";
             return s;
-        }else{
-            return "Ok, then, what is the "+getDomain().getContext().nextUnfilledSlot()+"?";
+        } else {
+            return "Ok, then, what is the " + getDomain().correspondingContext().nextUnfilledSlot() + "?";
         }
     }
 }

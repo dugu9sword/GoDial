@@ -8,7 +8,8 @@ import godial.domain.generator.IGenerator;
 /**
  * Created by zhouyi on 16-10-23.
  */
-public interface IDomain extends IConverter,IGenerator{
+public interface IDomain extends IConverter, IGenerator {
     UserAct convert(String utterance);
+
     String generate(SystemAct systemAct);
 }

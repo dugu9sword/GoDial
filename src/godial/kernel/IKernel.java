@@ -2,8 +2,6 @@ package godial.kernel;
 
 import godial.act.SystemAct;
 import godial.act.UserAct;
-import godial.context.Context;
-import godial.dialstructure.ConfigLoader;
 import godial.domain.Domain;
 
 import java.util.ArrayList;

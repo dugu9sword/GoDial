@@ -8,11 +8,11 @@ import java.util.ArrayList;
 public class DialStructure {
     private ArrayList<DialElement> dialElements;
 
-    public ArrayList<DialElement> getDialElements(){
+    public ArrayList<DialElement> getDialElements() {
         return dialElements;
     }
 
-    public DialStructure(ArrayList<DialElement> dialElements){
-        this.dialElements=dialElements;
+    public DialStructure(ArrayList<DialElement> dialElements) {
+        this.dialElements = dialElements;
     }
 }

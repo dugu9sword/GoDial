@@ -2,10 +2,8 @@ package test;
 
 import godial.domain.Domain;
 import godial.kernel.Kernel;
-import godial.utils.RegexUtil;
+import org.apache.log4j.PropertyConfigurator;
 
-import java.util.ArrayList;
-import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -13,19 +11,22 @@ import java.util.Scanner;
  */
 public class Main {
     public static void main(String[] args) {
+        PropertyConfigurator.configure("log4j.properties");
 
-//        ArrayList<String> a=new ArrayList<>(3);
-//        System.out.print(a.size());
-//        for(String x:a)
-//            System.out.println(x==null?"null":"yes");
+//        String x=null;
+//        if(x!=null)System.out.print("yes");
 //        System.exit(0);
 
         Kernel kernel=new Kernel();
-        Domain domain=new Domain("MOCK-FLIGHTBOOKING");
-        kernel.registerDomain(domain);
+        Domain domain1=new Domain("MOCK-FLIGHT-BOOKING");
+        Domain domain2=new Domain("MOCK-WEATHER-ASKING");
+        kernel.registerDomain(domain1);
+        kernel.registerDomain(domain2);
         Scanner scanner=new Scanner(System.in);
-        while (true){
-            System.out.println(kernel.work(scanner.nextLine()));
+        String input;
+        while (!(input=scanner.nextLine()).equals("bye")){
+            System.out.println("[System]:"+kernel.work(input)+"\n");
+            System.out.print("[User]:");
         }
 
 //        System.out.println(Pattern.compile("7th of May").matcher("7th of May").find().group(0));
