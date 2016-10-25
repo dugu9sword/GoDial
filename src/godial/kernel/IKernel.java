@@ -11,17 +11,13 @@ import java.util.ArrayList;
  */
 public interface IKernel {
 
-//    void newContext();
-
-//    ArrayList<Context> getContexts();
-
     void registerDomain(Domain domain);
 
     void execute(SystemAct systemAct);
 
-    UserAct select(ArrayList<UserAct> userActs);
+    ArrayList<UserAct> convert(String utterance);
 
-    SystemAct react(UserAct userAct);
+    SystemAct react(ArrayList<UserAct> userActs);
 
     String work(String utterance);
 

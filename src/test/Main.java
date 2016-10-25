@@ -1,20 +1,41 @@
 package test;
 
+import godial.act.ActType;
+import godial.act.ActUnit;
+import godial.act.UserAct;
 import godial.domain.Domain;
 import godial.kernel.Kernel;
 import org.apache.log4j.PropertyConfigurator;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
  * Created by zhouyi on 16-10-24.
  */
 public class Main {
-    public static void main(String[] args) {
+    static {
         PropertyConfigurator.configure("log4j.properties");
+    }
 
-//        String x=null;
-//        if(x!=null)System.out.print("yes");
+    public static void main(String[] args) {
+//        ArrayList<UserAct> u=new ArrayList<>();
+//        UserAct a1=new UserAct();
+//        a1.addActUnit(new ActUnit(ActType.UPDATE,null,null));
+//        a1.addActUnit(new ActUnit(ActType.UPDATE,null,null));
+//        a1.addActUnit(new ActUnit(ActType.UPDATE,null,null));
+//        UserAct a2=new UserAct();
+//        a2.addActUnit(new ActUnit(ActType.UPDATE,null,null));
+//        a2.addActUnit(new ActUnit(ActType.UPDATE,null,null));
+//
+//        u.add(a1);
+//        u.add(a2);
+//
+//        u.sort((UserAct o1,UserAct o2)->{
+//            return o1.getActUnits().size()-o2.getActUnits().size();
+//        });
+//
+//        System.out.print(u);
 //        System.exit(0);
 
         Kernel kernel=new Kernel();

@@ -7,10 +7,12 @@ public class DialElement {
     public String slot;
     public String pattern;
     public boolean required;
+    public DialEleType type;
 
-    public DialElement(String slot, String pattern, boolean required) {
+    public DialElement(String slot, String pattern, boolean required,DialEleType type) {
         this.slot = slot;
         this.pattern = pattern;
         this.required = required;
+        this.type=type;
     }
 }

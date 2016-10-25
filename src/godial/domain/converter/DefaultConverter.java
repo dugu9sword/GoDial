@@ -23,13 +23,8 @@ public class DefaultConverter extends AbstractConverter {
         UserAct userAct = new UserAct();
         for (DialElement dialElement : dialElements) {
             HashMap<String, String> map = RegexUtil.extract(utterance, dialElement.pattern);
-            if (map != null) {
-                ActUnit actUnit = new ActUnit();
-                actUnit.actType = ActType.INFORM;
-                actUnit.slot = dialElement.slot;
-                actUnit.value = map.toString();
-                userAct.addActUnit(actUnit);
-            }
+            if (map != null)
+                userAct.addActUnit(new ActUnit(ActType.INFORM,dialElement.slot,map.toString()));
         }
         if (userAct.getActUnits().isEmpty())
             return UserAct.NONE;
