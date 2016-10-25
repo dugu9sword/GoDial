@@ -53,20 +53,19 @@ public class Kernel implements IKernel {
     }
 
     public void execute(SystemAct systemAct) {
-        log.info(systemAct);
-        if (systemAct == SystemAct.NONE) {
-
-        }
-
         ArrayList<ActUnit> actUnits = systemAct.getActUnits();
         for (ActUnit actUnit : actUnits) {
             switch (actUnit.actType) {
-                case INFORM:
+                case GROUND:
                     systemAct.getContext().setSlot(actUnit.slot, actUnit.value);
+
                     log.info("System act will fill the slot " + actUnit.slot + " with " + actUnit.value);
                     break;
+
             }
         }
+        if(systemAct.getContext().hasUnfilledSlot())
+            systemAct.addActUnit(new ActUnit(ActType.REQUEST,systemAct.getContext().nextUnfilledSlot(),null));
 
     }
 
@@ -91,7 +90,7 @@ public class Kernel implements IKernel {
 
         DialEleType utterType = NameEntityRecognizer.convert(utterance);
         if(lastSystemAct!=null) {
-            log.info("Name entity is "+utterType+" "+lastSystemAct.requestingDialElement().type);
+            log.info("Name entity is "+utterType);
             UserAct userAct = new UserAct();
             userAct.setContext(getLastDomain().correspondingContext());
             if (lastSystemAct.isRequesting() && utterType == lastSystemAct.requestingDialElement().type) {
@@ -142,7 +141,7 @@ public class Kernel implements IKernel {
             if (userAct != UserAct.NONE)
                 validUserActs.add(userAct);
 
-        SystemAct systemAct = new SystemAct();
+        SystemAct systemAct;
         switch (validUserActs.size()) {
             case 0:
                 log.info("Faced with NONE");
@@ -186,7 +185,6 @@ public class Kernel implements IKernel {
             switch (actUnit.actType) {
                 case INFORM:
                     systemAct.addActUnit(new ActUnit(ActType.GROUND, actUnit.slot, actUnit.value));
-                    systemAct.addActUnit(new ActUnit(ActType.REQUEST,systemAct.getContext().nextUnfilledSlot(),null));
                     break;
                 case SELECT:
                     chosenAct=Integer.parseInt(actUnit.value);
@@ -214,7 +212,20 @@ public class Kernel implements IKernel {
 
         execute(systemAct);
 
-        String systemUtterance = getLastDomain().generate(systemAct);   // TODO:Maybe something wrong
+        String systemUtterance;
+        if(systemAct==SystemAct.NONE){
+            systemUtterance="Hello, what can i do for you?";
+        }else {
+            systemUtterance = getLastDomain().generate(systemAct);   // TODO:Maybe something wrong
+
+            if (!getLastDomain().correspondingContext().hasUnfilledSlot()) {
+                domainContextHashMap.remove(getLastDomain());
+
+                lastSystemAct = null;
+                lastUserActs = null;
+                chosenAct = 0;
+            }
+        }
 
         return systemUtterance;
     }

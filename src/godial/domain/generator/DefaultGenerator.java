@@ -18,17 +18,18 @@ public class DefaultGenerator extends AbstractGenerator {
     static Log log= LogFactory.getLog(DefaultGenerator.class);
 
     public String generate(SystemAct systemAct) {
+
         log.info("Next unfilled Slot is "+getDomain().correspondingContext().nextUnfilledSlot());
         if (getDomain().correspondingContext().nextUnfilledSlot() == null) {
             String s = "OK! I will do that for you.\n";
             ArrayList<DialElement> dialElements = getDomain().getDialStructure().getDialElements();
             HashMap<String,String> values=getDomain().correspondingContext().getValues();
             for (DialElement dialElement:dialElements)
-                s += dialElement.slot + "\t" + values.get(dialElement.slot) + "\n";
+                s += "- \t\t"+dialElement.slot + "\t" + values.get(dialElement.slot) + "\n";
             s += "Anything else?";
             return s;
         } else {
-            return "Ok, then, what is the " + getDomain().correspondingContext().nextUnfilledSlot() + "?";
+            return "Ok, what is the " + getDomain().correspondingContext().nextUnfilledSlot() + "?";
         }
     }
 }

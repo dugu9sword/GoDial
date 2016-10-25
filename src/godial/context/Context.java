@@ -38,6 +38,10 @@ public class Context {
         return null;
     }
 
+    public boolean hasUnfilledSlot(){
+        return nextUnfilledSlot()!=null;
+    }
+
     public HashMap<String, String> getValues() {
         return values;
     }
