@@ -8,24 +8,6 @@ import godial.dialstructure.DialElement;
 public class SystemAct extends AbstractAct {
     public static final SystemAct NONE = new SystemAct();
 
-    public boolean isRequesting() {
-        return requestingDialElement() != null ? true : false;
-    }
-
-    public DialElement requestingDialElement() {
-        String slot = null;
-        for (ActUnit actUnit : getActUnits())
-            if (actUnit.actType == ActType.REQUEST)
-                slot = actUnit.slot;
-
-        if (slot == null)
-            return null;
-        for (DialElement dialElement : getContext().getDialStructure().getDialElements())
-            if (dialElement.slot.equals(slot))
-                return dialElement;
-        return null;
-    }
-
     public boolean isClarifyingYesOrNo() {
         for (ActUnit actUnit : getActUnits())
             if (actUnit.actType == ActType.CLARIFY_YES_NO)

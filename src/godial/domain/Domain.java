@@ -16,6 +16,8 @@ import godial.kernel.Kernel;
  */
 public class Domain implements IDomain {
 
+    private String name;
+
     private DialStructure dialStructure;
     private AbstractConverter converter;
     private AbstractGenerator generator;
@@ -63,5 +65,14 @@ public class Domain implements IDomain {
         loadDialStructure(path);
         setConverter(new DefaultConverter());
         setGenerator(new DefaultGenerator());
+        name=path;
     }
+
+    private Domain(){}
+
+    public String toString(){
+        return name;
+    }
+
+    public static final Domain SYSTEM=new Domain();
 }

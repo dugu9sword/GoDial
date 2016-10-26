@@ -1,6 +1,6 @@
 package godial.act;
 
-import godial.context.Context;
+import godial.domain.Domain;
 
 import java.util.ArrayList;
 
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class AbstractAct {
     private ArrayList<ActUnit> actUnits;
 
-    private Context context;
+    private Domain domain;
 
     public AbstractAct() {
         actUnits = new ArrayList<>();
@@ -24,12 +24,12 @@ public class AbstractAct {
         return actUnits;
     }
 
-    public void setContext(Context context) {
-        this.context = context;
+    public void setDomain(Domain domain) {
+        this.domain = domain;
     }
 
-    public Context getContext() {
-        return context;
+    public Domain getDomain() {
+        return domain;
     }
 
     public String toString(){

@@ -31,15 +31,15 @@ public class Context {
         values.put(slot, value);
     }
 
-    public String nextUnfilledSlot() {
+    public DialElement nextUnfilledDialElement() {
         for (DialElement dialElement : dialStructure.getDialElements())
             if (dialElement.required && !values.containsKey(dialElement.slot))
-                return dialElement.slot;
+                return dialElement;
         return null;
     }
 
-    public boolean hasUnfilledSlot(){
-        return nextUnfilledSlot()!=null;
+    public boolean hasUnfilledDialElement(){
+        return nextUnfilledDialElement()!=null;
     }
 
     public HashMap<String, String> getValues() {

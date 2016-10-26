@@ -15,4 +15,8 @@ public class DialElement {
         this.required = required;
         this.type=type;
     }
+
+    public String toString(){
+        return "slot: "+slot+"\ttype: "+type+"\trequired: "+required;
+    }
 }

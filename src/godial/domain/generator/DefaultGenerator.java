@@ -19,8 +19,7 @@ public class DefaultGenerator extends AbstractGenerator {
 
     public String generate(SystemAct systemAct) {
 
-        log.info("Next unfilled Slot is "+getDomain().correspondingContext().nextUnfilledSlot());
-        if (getDomain().correspondingContext().nextUnfilledSlot() == null) {
+        if (getDomain().correspondingContext().nextUnfilledDialElement() == null) {
             String s = "OK! I will do that for you.\n";
             ArrayList<DialElement> dialElements = getDomain().getDialStructure().getDialElements();
             HashMap<String,String> values=getDomain().correspondingContext().getValues();
@@ -29,7 +28,7 @@ public class DefaultGenerator extends AbstractGenerator {
             s += "Anything else?";
             return s;
         } else {
-            return "Ok, what is the " + getDomain().correspondingContext().nextUnfilledSlot() + "?";
+            return "Ok, what is the " + getDomain().correspondingContext().nextUnfilledDialElement() + "?";
         }
     }
 }
