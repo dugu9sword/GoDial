@@ -41,6 +41,20 @@ public class ConfigLoader {
             dialElements.add(day);
             DialStructure dialStructure = new DialStructure(dialElements);
             return dialStructure;
+        }else if(filePath.equals("MOCK-REMIND-SERVICE")){
+            DialElement todo = new DialElement("todo",
+                    "remind me to {todo};{todo}=(do homework|play football|exercise)",
+                    true,
+                    DialEleType.OTHER);
+            DialElement date = new DialElement("date",
+                    "(on the {day}th of {month})|(on {month} {day}th);{day}=\\d+,{month}=(May|June|July)",
+                    true,
+                    DialEleType.DATE);
+            ArrayList<DialElement> dialElements = new ArrayList<>();
+            dialElements.add(todo);
+            dialElements.add(date);
+            DialStructure dialStructure = new DialStructure(dialElements);
+            return dialStructure;
         }
         return null;
     }

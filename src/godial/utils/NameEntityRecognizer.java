@@ -9,7 +9,7 @@ public class NameEntityRecognizer {
     public static DialEleType convert(String utterance) {
         if(utterance.matches("(Beijing|Shanghai|Guangzhou|Shenzhen)"))
             return DialEleType.LOCATION;
-        if(utterance.matches("the \\d+th of (May|June|July)"))
+        if(utterance.matches("(((the \\d+th of (May|June|July))|(May|June|July) \\d+th))"))
             return DialEleType.DATE;
         if (utterance.matches("(\\d+|one|two|three|four)"))
             return DialEleType.NUMBER;

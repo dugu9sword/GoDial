@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Generator a response by simply asking "What is the {slot}?".
+ * Generator a response by simply asking "What is the {slot} of {Domain}?".
  * <p>
  * <p>
  * Created by zhouyi on 16-10-23.
@@ -28,7 +28,8 @@ public class DefaultGenerator extends AbstractGenerator {
             s += "Anything else?";
             return s;
         } else {
-            return "Ok, what is the " + getDomain().correspondingContext().nextUnfilledDialElement() + "?";
+            DialElement unfilled=getDomain().correspondingContext().nextUnfilledDialElement();
+            return "Ok, what is the " +unfilled .slot +" (of "+ getDomain() + ")?";
         }
     }
 }

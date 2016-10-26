@@ -34,6 +34,7 @@ public class Kernel implements IKernel {
     public static final String CLARIFYING_YES_OR_NO = "CLARIFYING_YES_OR_NO";
     public static final String CLARIFYING_OPTION = "CLARIFYING_OPTION";
     public static final String DOMAIN_FINISHED = "DOMAIN_FINISHED";
+    public static final String CLARIFYING_FLAG = "CLARIFYING_FLAG";
 
 
     public Kernel() {
@@ -54,6 +55,18 @@ public class Kernel implements IKernel {
     public void init() {
         log.info("[init]\tBefore input, state are filled with " + state.keySet());
         log.info("[init]\tBefore input, contexts are filled with " + domainContextHashMap.keySet());
+
+        /**
+         * If the user has not responsed to the request for clarification, clear the flag.
+         */
+        if(state.containsKey(CLARIFYING_OPTION) && !state.containsKey(CLARIFYING_FLAG))
+            state.put(CLARIFYING_FLAG,null);
+        else if(state.containsKey(CLARIFYING_FLAG)) {
+            state.remove(CLARIFYING_OPTION);
+            state.remove(CLARIFYING_FLAG);
+            state.remove(LAST_USER_ACTS);
+        }
+
         if (state.containsKey(DOMAIN_FINISHED)) {
             lastDomain = null;
             state.clear();
@@ -88,7 +101,7 @@ public class Kernel implements IKernel {
         if (state.containsKey(REQUESTING_DIAL_ELEMENT)) {
             DialElement dialElement = (DialElement) state.get(REQUESTING_DIAL_ELEMENT);
             if (utterType == dialElement.type) {
-                log.info("[Convert]\tCurrently requesting" + utterType);
+                log.info("[Convert]\tCurrently requesting " + utterType);
                 UserAct userAct = new UserAct();
                 userAct.setDomain(lastDomain);
                 userAct.addActUnit(new ActUnit(ActType.INFORM, dialElement.slot, utterance));
@@ -98,7 +111,7 @@ public class Kernel implements IKernel {
 
         if (state.containsKey(CLARIFYING_YES_OR_NO)) {
             if (utterType == DialEleType.CONFIRMATION || utterType == DialEleType.CANCELLATION) {
-                log.info("[Convert]\tCurrently requesting" + utterType);
+                log.info("[Convert]\tCurrently requesting " + utterType);
                 UserAct userAct = new UserAct();
                 userAct.setDomain(Domain.SYSTEM);
                 userAct.addActUnit(new ActUnit(utterType == DialEleType.CONFIRMATION ? ActType.INFORM : ActType.CANCEL,
@@ -110,7 +123,7 @@ public class Kernel implements IKernel {
 
         if (state.containsKey(CLARIFYING_OPTION)) {
             if (utterType == DialEleType.NUMBER) {
-                log.info("[Convert]\tCurrently requesting" + utterType);
+                log.info("[Convert]\tCurrently requesting " + utterType);
                 UserAct userAct = new UserAct();
                 userAct.setDomain(Domain.SYSTEM);
                 userAct.addActUnit(new ActUnit(ActType.SELECT,
@@ -126,6 +139,7 @@ public class Kernel implements IKernel {
             userActs.add(userAct);
         }
 
+
         return userActs;
     }
 
@@ -137,6 +151,8 @@ public class Kernel implements IKernel {
         for (UserAct userAct : userActs)
             if (userAct != UserAct.NONE)
                 validUserActs.add(userAct);
+
+        log.info("[React]\tTotally " + validUserActs.size() + " valid user acts, they are " + validUserActs);
 
         SystemAct systemAct;
         switch (validUserActs.size()) {
@@ -152,8 +168,9 @@ public class Kernel implements IKernel {
             default:
                 log.info("[React]\tFaced with " + validUserActs.size() + " valid user acts");
                 systemAct = new SystemAct();
+                systemAct.setDomain(Domain.SYSTEM);
                 // the first userAct in the list will be the most preferred
-                userActs.sort((UserAct o2, UserAct o1) -> {
+                validUserActs.sort((UserAct o2, UserAct o1) -> {
                     if (o1.getDomain() == lastDomain)
                         return 1;
                     else if (o2.getDomain() == lastDomain)
@@ -161,12 +178,14 @@ public class Kernel implements IKernel {
                     else
                         return o1.getActUnits().size() - o2.getActUnits().size();
                 });
-                state.put(LAST_USER_ACTS, userActs);
                 StringBuffer sb = new StringBuffer();
                 sb.append("Sorry, but what do you mean? You may select one of the following options:\n");
-                for (int i = 0; i < userActs.size(); i++)
-                    sb.append(i + ".\t" + userActs.get(i).toString());  //  TODO: How to represent user act?
-                systemAct.addActUnit(new ActUnit(ActType.CLARIFY_OPTION, null, sb.toString()));
+                for (int i = 0; i < validUserActs.size(); i++)
+                    sb.append("\t"+ (i+1) + ".\t" + validUserActs.get(i).getDomain() +"\t"+validUserActs.get(i).toString()+"\n");  //  TODO: How to represent user act?
+                state.put(CLARIFYING_OPTION, sb.toString());
+                state.put(LAST_USER_ACTS, validUserActs);
+                lastDomain = Domain.SYSTEM;
+//                systemAct.addActUnit(new ActUnit(ActType.CLARIFY_OPTION, null, sb.toString()));
                 break;
         }
         return systemAct;
@@ -192,6 +211,9 @@ public class Kernel implements IKernel {
                     ArrayList<UserAct> lastUserActs = (ArrayList<UserAct>) state.get(LAST_USER_ACTS);
                     if (chosenAct <= lastUserActs.size())
                         systemAct = handle(lastUserActs.get(chosenAct - 1));
+                    state.remove(LAST_USER_ACTS);
+                    state.remove(CLARIFYING_OPTION);
+                    state.remove(CLARIFYING_FLAG);
                     break;
                 case CONFIRM:
 
@@ -213,15 +235,23 @@ public class Kernel implements IKernel {
                     systemAct.getDomain().correspondingContext().setSlot(actUnit.slot, actUnit.value);
 
                     log.info("[Execute]\tSystem act will fill the slot " + actUnit.slot + " with " + actUnit.value);
+
+                    if (systemAct.getDomain().correspondingContext().hasUnfilledDialElement()) {
+                        log.info("[Execute]\tPut a new REQ_DIA_ELEMENT " + systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
+                        state.put(REQUESTING_DIAL_ELEMENT, systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
+                    } else {
+                        state.put(DOMAIN_FINISHED, lastDomain);
+                    }
+
+                    break;
+                case CLARIFY_OPTION:
+//                    state.put(CLARIFYING_OPTION,actUnit.value);
+//                    state.put(LAST_USER_ACTS,)
                     break;
             }
         }
-        if (systemAct.getDomain().correspondingContext().hasUnfilledDialElement()) {
-            log.info("[Execute]\tPut a new REQ_DIA_ELEMENT " + systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
-            state.put(REQUESTING_DIAL_ELEMENT, systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
-        } else {
-            state.put(DOMAIN_FINISHED, lastDomain);
-        }
+
+
     }
 
 
@@ -238,12 +268,15 @@ public class Kernel implements IKernel {
         if (systemAct != SystemAct.NONE) {
             execute(systemAct);
 
-            systemUtterance = lastDomain.generate(systemAct);   // TODO:Maybe something wrong
-
-            // If a context has been closed, reset the current state.
-            if (!lastDomain.correspondingContext().hasUnfilledDialElement()) {
-                domainContextHashMap.remove(lastDomain);
-                state.clear();
+            if (lastDomain == Domain.SYSTEM) {
+                systemUtterance = (String) state.get(CLARIFYING_OPTION);
+            } else {
+                systemUtterance = lastDomain.generate(systemAct);
+                // If a context has been closed, reset the current state.
+                if (!lastDomain.correspondingContext().hasUnfilledDialElement()) {
+                    domainContextHashMap.remove(lastDomain);
+                    state.clear();
+                }
             }
         } else
             systemUtterance = "Hello, what can i do for you?";
