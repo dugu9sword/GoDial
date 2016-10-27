@@ -17,7 +17,7 @@ import java.util.HashMap;
 public class DefaultGenerator extends AbstractGenerator {
     static Log log= LogFactory.getLog(DefaultGenerator.class);
 
-    public String generate(SystemAct systemAct) {
+    public String generate(HashMap map) {
 
         if (getDomain().correspondingContext().nextUnfilledDialElement() == null) {
             String s = "OK! I will do that for you.\n";

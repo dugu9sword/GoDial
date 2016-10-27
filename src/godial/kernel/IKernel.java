@@ -5,6 +5,7 @@ import godial.act.UserAct;
 import godial.domain.Domain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by zhouyi on 16-10-23.
@@ -13,7 +14,7 @@ public interface IKernel {
 
     void registerDomain(Domain domain);
 
-    void execute(SystemAct systemAct);
+    HashMap run(SystemAct systemAct);
 
     ArrayList<UserAct> convert(String utterance);
 

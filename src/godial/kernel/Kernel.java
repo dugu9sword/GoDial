@@ -25,7 +25,7 @@ public class Kernel implements IKernel {
     private ArrayList<Domain> domains;
     private HashMap<Domain, Context> domainContextHashMap;
     private Domain lastDomain;
-    private HashMap state;
+    private HashMap globalState;
 
     public static final String LAST_SYSTEM_ACT = "LAST_SYSTEM_ACT";
     public static final String LAST_USER_ACTS = "LAST_USER_ACTS";
@@ -40,7 +40,7 @@ public class Kernel implements IKernel {
     public Kernel() {
         domainContextHashMap = new HashMap<>();
         domains = new ArrayList<>();
-        state = new HashMap();
+        globalState = new HashMap();
     }
 
     public void registerDomain(Domain domain) {
@@ -53,23 +53,23 @@ public class Kernel implements IKernel {
     }
 
     public void init() {
-        log.info("[init]\tBefore input, state are filled with " + state.keySet());
+        log.info("[init]\tBefore input, globalState are filled with " + globalState.keySet());
         log.info("[init]\tBefore input, contexts are filled with " + domainContextHashMap.keySet());
 
         /**
          * If the user has not responsed to the request for clarification, clear the flag.
          */
-        if(state.containsKey(CLARIFYING_OPTION) && !state.containsKey(CLARIFYING_FLAG))
-            state.put(CLARIFYING_FLAG,null);
-        else if(state.containsKey(CLARIFYING_FLAG)) {
-            state.remove(CLARIFYING_OPTION);
-            state.remove(CLARIFYING_FLAG);
-            state.remove(LAST_USER_ACTS);
+        if(globalState.containsKey(CLARIFYING_OPTION) && !globalState.containsKey(CLARIFYING_FLAG))
+            globalState.put(CLARIFYING_FLAG,null);
+        else if(globalState.containsKey(CLARIFYING_FLAG)) {
+            globalState.remove(CLARIFYING_OPTION);
+            globalState.remove(CLARIFYING_FLAG);
+            globalState.remove(LAST_USER_ACTS);
         }
 
-        if (state.containsKey(DOMAIN_FINISHED)) {
+        if (globalState.containsKey(DOMAIN_FINISHED)) {
             lastDomain = null;
-            state.clear();
+            globalState.clear();
         }
     }
 
@@ -98,8 +98,8 @@ public class Kernel implements IKernel {
         DialEleType utterType = NameEntityRecognizer.convert(utterance);
         log.info("[Convert]\tName entity is " + utterType);
 
-        if (state.containsKey(REQUESTING_DIAL_ELEMENT)) {
-            DialElement dialElement = (DialElement) state.get(REQUESTING_DIAL_ELEMENT);
+        if (globalState.containsKey(REQUESTING_DIAL_ELEMENT)) {
+            DialElement dialElement = (DialElement) globalState.get(REQUESTING_DIAL_ELEMENT);
             if (utterType == dialElement.type) {
                 log.info("[Convert]\tCurrently requesting " + utterType);
                 UserAct userAct = new UserAct();
@@ -109,7 +109,7 @@ public class Kernel implements IKernel {
             }
         }
 
-        if (state.containsKey(CLARIFYING_YES_OR_NO)) {
+        if (globalState.containsKey(CLARIFYING_YES_OR_NO)) {
             if (utterType == DialEleType.CONFIRMATION || utterType == DialEleType.CANCELLATION) {
                 log.info("[Convert]\tCurrently requesting " + utterType);
                 UserAct userAct = new UserAct();
@@ -121,7 +121,7 @@ public class Kernel implements IKernel {
             }
         }
 
-        if (state.containsKey(CLARIFYING_OPTION)) {
+        if (globalState.containsKey(CLARIFYING_OPTION)) {
             if (utterType == DialEleType.NUMBER) {
                 log.info("[Convert]\tCurrently requesting " + utterType);
                 UserAct userAct = new UserAct();
@@ -182,8 +182,8 @@ public class Kernel implements IKernel {
                 sb.append("Sorry, but what do you mean? You may select one of the following options:\n");
                 for (int i = 0; i < validUserActs.size(); i++)
                     sb.append("\t"+ (i+1) + ".\t" + validUserActs.get(i).getDomain() +"\t"+validUserActs.get(i).toString()+"\n");  //  TODO: How to represent user act?
-                state.put(CLARIFYING_OPTION, sb.toString());
-                state.put(LAST_USER_ACTS, validUserActs);
+                globalState.put(CLARIFYING_OPTION, sb.toString());
+                globalState.put(LAST_USER_ACTS, validUserActs);
                 lastDomain = Domain.SYSTEM;
 //                systemAct.addActUnit(new ActUnit(ActType.CLARIFY_OPTION, null, sb.toString()));
                 break;
@@ -208,12 +208,12 @@ public class Kernel implements IKernel {
                     break;
                 case SELECT:
                     int chosenAct = Integer.parseInt(actUnit.value);
-                    ArrayList<UserAct> lastUserActs = (ArrayList<UserAct>) state.get(LAST_USER_ACTS);
+                    ArrayList<UserAct> lastUserActs = (ArrayList<UserAct>) globalState.get(LAST_USER_ACTS);
                     if (chosenAct <= lastUserActs.size())
                         systemAct = handle(lastUserActs.get(chosenAct - 1));
-                    state.remove(LAST_USER_ACTS);
-                    state.remove(CLARIFYING_OPTION);
-                    state.remove(CLARIFYING_FLAG);
+                    globalState.remove(LAST_USER_ACTS);
+                    globalState.remove(CLARIFYING_OPTION);
+                    globalState.remove(CLARIFYING_FLAG);
                     break;
                 case CONFIRM:
 
@@ -227,7 +227,8 @@ public class Kernel implements IKernel {
         return systemAct;
     }
 
-    public void execute(SystemAct systemAct) {
+    public HashMap run(SystemAct systemAct) {
+        HashMap tempState=null;
         ArrayList<ActUnit> actUnits = systemAct.getActUnits();
         for (ActUnit actUnit : actUnits) {
             switch (actUnit.actType) {
@@ -238,19 +239,19 @@ public class Kernel implements IKernel {
 
                     if (systemAct.getDomain().correspondingContext().hasUnfilledDialElement()) {
                         log.info("[Execute]\tPut a new REQ_DIA_ELEMENT " + systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
-                        state.put(REQUESTING_DIAL_ELEMENT, systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
+                        globalState.put(REQUESTING_DIAL_ELEMENT, systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
                     } else {
-                        state.put(DOMAIN_FINISHED, lastDomain);
+                        globalState.put(DOMAIN_FINISHED, lastDomain);
                     }
-
+                    tempState=systemAct.getDomain().execute(systemAct);
                     break;
                 case CLARIFY_OPTION:
-//                    state.put(CLARIFYING_OPTION,actUnit.value);
-//                    state.put(LAST_USER_ACTS,)
+//                    globalState.put(CLARIFYING_OPTION,actUnit.value);
+//                    globalState.put(LAST_USER_ACTS,)
                     break;
             }
         }
-
+        return tempState==null?new HashMap():tempState;
 
     }
 
@@ -266,16 +267,16 @@ public class Kernel implements IKernel {
         String systemUtterance;
 
         if (systemAct != SystemAct.NONE) {
-            execute(systemAct);
+            HashMap tempState=run(systemAct);
 
             if (lastDomain == Domain.SYSTEM) {
-                systemUtterance = (String) state.get(CLARIFYING_OPTION);
+                systemUtterance = (String) globalState.get(CLARIFYING_OPTION);
             } else {
-                systemUtterance = lastDomain.generate(systemAct);
-                // If a context has been closed, reset the current state.
+                systemUtterance = lastDomain.generate(tempState);
+                // If a context has been closed, reset the current globalState.
                 if (!lastDomain.correspondingContext().hasUnfilledDialElement()) {
                     domainContextHashMap.remove(lastDomain);
-                    state.clear();
+                    globalState.clear();
                 }
             }
         } else
