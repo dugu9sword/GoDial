@@ -235,15 +235,16 @@ public class Kernel implements IKernel {
                 case GROUND:
                     systemAct.getDomain().correspondingContext().setSlot(actUnit.slot, actUnit.value);
 
-                    log.info("[Execute]\tSystem act will fill the slot " + actUnit.slot + " with " + actUnit.value);
+                    log.info("[Run]\tSystem act will fill the slot " + actUnit.slot + " with " + actUnit.value);
 
                     if (systemAct.getDomain().correspondingContext().hasUnfilledDialElement()) {
-                        log.info("[Execute]\tPut a new REQ_DIA_ELEMENT " + systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
+                        log.info("[Run]\tPut a new REQ_DIA_ELEMENT " + systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
                         globalState.put(REQUESTING_DIAL_ELEMENT, systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
                     } else {
                         globalState.put(DOMAIN_FINISHED, lastDomain);
                     }
-                    tempState=systemAct.getDomain().execute(systemAct);
+                    if(!systemAct.getDomain().correspondingContext().hasUnfilledDialElement())
+                        tempState=systemAct.getDomain().execute(systemAct);
                     break;
                 case CLARIFY_OPTION:
 //                    globalState.put(CLARIFYING_OPTION,actUnit.value);

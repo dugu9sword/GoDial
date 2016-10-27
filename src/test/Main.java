@@ -25,7 +25,11 @@ public class Main {
     public static void main(String[] args) {
 
         Kernel kernel=new Kernel();
+
         Domain domain1=new Domain("MOCK-FLIGHT-BOOKING");
+        domain1.setExecutor(new FlightBookingExecutor());
+        domain1.setGenerator(new FlightBookingGenerator());
+
         Domain domain2=new Domain("MOCK-WEATHER-ASKING");
         Domain domain3=new Domain("MOCK-REMIND-SERVICE");
 
