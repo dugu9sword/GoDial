@@ -1,5 +1,6 @@
 package godial.domain;
 
+import com.sun.java.browser.plugin2.DOM;
 import godial.act.SystemAct;
 import godial.act.UserAct;
 import godial.context.Context;

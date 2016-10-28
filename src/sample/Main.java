@@ -29,8 +29,11 @@ public class Main {
         }
 
         Domain domain2 = Domain.newInstance(path + "MOCK-WEATHER-ASKING.json");
-        if (domain2 != null)
-            kernel.registerDomain(domain2);
+        if (domain2 != null) {
+            domain2.setExecutor(new WeatherAskingExecutor());
+            domain2.setGenerator(new WeatherAskingGenerator());
+            kernel.registerDomain (domain2);
+        }
 
         Domain domain3 = Domain.newInstance(path + "MOCK-REMIND-SERVICE.json");
         if (domain3 != null)

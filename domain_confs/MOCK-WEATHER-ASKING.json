@@ -9,7 +9,7 @@
       "type": "LOCATION"
     },
     {
-      "slot": "day",
+      "slot": "date",
       "pattern": "(on the {day}th of {month})|(on {month} {day}th);{day}=\\d+,{month}=(May|June|July)",
       "required": true,
       "type": "DATE"

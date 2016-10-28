@@ -29,7 +29,7 @@ public class DefaultGenerator extends AbstractGenerator {
             return generated.toString();
         } else {
             DialElement unfilled = getDomain().correspondingContext().nextUnfilledDialElement();
-            return "Ok, what is the " + unfilled.slot + " of (" + getDomain() + ")?";
+            return "Ok, what is the " + unfilled.slot + " of " + getDomain() + "?";
         }
     }
 }

@@ -27,11 +27,11 @@ public class Kernel implements IKernel {
     private static final String IS_RESPONDING_TO_SYSTEM = "IS_RESPONDING_TO_SYSTEM";
     private static final String DOMAIN_FINISHED = "DOMAIN_FINISHED";
     private static final String DOMAIN_CREATED = "DOMAIN_CREATED";
+    private static final String LAST_DOMAIN="LAST_DOMAIN";
 
     static Log log = LogFactory.getLog(Kernel.class);
     private ArrayList<Domain> domains;
     private HashMap<Domain, Context> domainContextHashMap;
-    private Domain lastDomain;
     private HashMap globalState;
 
 
@@ -55,16 +55,35 @@ public class Kernel implements IKernel {
             globalState.remove(state);
     }
 
-    public void init() {
-        log.info("[init]\tBefore input, globalState are filled with " + globalState.keySet());
-        log.info("[init]\tBefore input, contexts are filled with " + domainContextHashMap.keySet());
+    private void setState(String state){
+        globalState.put(state,null);
+    }
 
-        if (globalState.containsKey(DOMAIN_FINISHED)) {
-            lastDomain = null;
+    private void setValueOfState(String state,Object value){
+        if(globalState.containsKey(state))
+            globalState.replace(state,value);
+        else
+            globalState.put(state,value);
+    }
+
+    private boolean stateIsSet(String state){
+        return globalState.containsKey(state);
+    }
+
+    private Object getValueOfState(String state){
+        return globalState.get(state);
+    }
+
+
+    public void init() {
+        if (stateIsSet(DOMAIN_FINISHED)) {
             globalState.clear();
         }
         clearStateIfSet(DOMAIN_CREATED);
         clearStateIfSet(IS_RESPONDING_TO_SYSTEM);
+
+        log.info("[init]\tBefore input, globalState are filled with " + globalState.keySet());
+        log.info("[init]\tBefore input, contexts are filled with " + domainContextHashMap.keySet());
     }
 
 
@@ -86,28 +105,28 @@ public class Kernel implements IKernel {
      */
     public ArrayList<UserAct> convert(String utterance) {
         ArrayList<UserAct> userActs = new ArrayList<>();
-        if (lastDomain == null)
+        if (!stateIsSet(LAST_DOMAIN))
             log.info("[Convert]\tLast domain NOT exists");
         else
-            log.info("[Convert]\tLast domain is " + lastDomain);
+            log.info("[Convert]\tLast domain is "+getValueOfState(LAST_DOMAIN));
 
         DialEleType utterType = NameEntityRecognizer.convert(utterance);
         log.info("[Convert]\tName entity is " + utterType);
 
         boolean isRespondingToSystem = false;
 
-        if (globalState.containsKey(REQUESTING_DIAL_ELEMENT)) {
-            DialElement dialElement = (DialElement) globalState.get(REQUESTING_DIAL_ELEMENT);
+        if (stateIsSet(REQUESTING_DIAL_ELEMENT)) {
+            DialElement dialElement = (DialElement) getValueOfState(REQUESTING_DIAL_ELEMENT);
             if (utterType == dialElement.type) {
                 log.info("[Convert]\tCurrently requesting " + utterType);
                 UserAct userAct = new UserAct();
-                userAct.setDomain(lastDomain);
+                // If this statement can be executed, the last domain must have been set in the previous step
+                userAct.setDomain((Domain)getValueOfState(LAST_DOMAIN));
                 userAct.addActUnit(new ActUnit(ActType.INFORM, dialElement.slot, utterance));
                 userActs.add(userAct);
                 isRespondingToSystem = true;
-            } else
-                globalState.remove(REQUESTING_DIAL_ELEMENT);
-        } else if (globalState.containsKey(CLARIFYING_YES_OR_NO)) {
+            }
+        } else if (stateIsSet(CLARIFYING_YES_OR_NO)) {
             if (utterType == DialEleType.CONFIRMATION || utterType == DialEleType.CANCELLATION) {
                 log.info("[Convert]\tCurrently requesting " + utterType);
                 UserAct userAct = new UserAct();
@@ -117,9 +136,8 @@ public class Kernel implements IKernel {
                         null));
                 userActs.add(userAct);
                 isRespondingToSystem = true;
-            } else
-                globalState.remove(CLARIFYING_YES_OR_NO);
-        } else if (globalState.containsKey(CLARIFYING_OPTION)) {
+            }
+        } else if (stateIsSet(CLARIFYING_OPTION)) {
             if (utterType == DialEleType.NUMBER) {
                 log.info("[Convert]\tCurrently requesting " + utterType);
                 UserAct userAct = new UserAct();
@@ -129,8 +147,7 @@ public class Kernel implements IKernel {
                         utterance));
                 userActs.add(userAct);
                 isRespondingToSystem = true;
-            } else
-                globalState.remove(CLARIFYING_OPTION);
+            }
         }
 
         if (!isRespondingToSystem) {
@@ -140,7 +157,12 @@ public class Kernel implements IKernel {
                 userActs.add(userAct);
             }
         } else
-            globalState.put(IS_RESPONDING_TO_SYSTEM, null);
+            setState(IS_RESPONDING_TO_SYSTEM);
+
+        clearStateIfSet(REQUESTING_DIAL_ELEMENT);
+        clearStateIfSet(CLARIFYING_OPTION);
+        clearStateIfSet(CLARIFYING_YES_OR_NO);
+        clearStateIfSet(LAST_USER_ACTS);
 
         return userActs;
     }
@@ -155,10 +177,12 @@ public class Kernel implements IKernel {
      * @return
      */
     public SystemAct react(ArrayList<UserAct> userActs) {
-        if (lastDomain == null)
+        if (!stateIsSet(LAST_DOMAIN))
             log.info("[React]\tLast domain NOT exists");
+        else
+            log.info("[React]\tLast domain is "+getValueOfState(LAST_DOMAIN));
 
-        if (globalState.containsKey(IS_RESPONDING_TO_SYSTEM)) {
+        if (stateIsSet(IS_RESPONDING_TO_SYSTEM)) {
             return handle(userActs.get(0));
         }
 
@@ -192,6 +216,7 @@ public class Kernel implements IKernel {
                 systemAct.setDomain(Domain.SYSTEM);
                 // the first userAct in the list will be the most preferred
                 validUserActs.sort((UserAct o2, UserAct o1) -> {
+                    Domain lastDomain=(Domain)globalState.get(LAST_DOMAIN);
                     if (o1.getDomain() == lastDomain)
                         return 1;
                     else if (o2.getDomain() == lastDomain)
@@ -202,11 +227,9 @@ public class Kernel implements IKernel {
                 StringBuffer sb = new StringBuffer();
                 sb.append("Sorry, but what do you mean? You may select one of the following options:\n");
                 for (int i = 0; i < validUserActs.size(); i++)
-                    sb.append("\t" + (i + 1) + ".\t" + validUserActs.get(i).getDomain() + "\t" + validUserActs.get(i).toString() + "\n");  //  TODO: How to represent user act?
-                globalState.put(CLARIFYING_OPTION, sb.toString());
-                globalState.put(LAST_USER_ACTS, validUserActs);
-                lastDomain = Domain.SYSTEM;
-//                systemAct.addActUnit(new ActUnit(ActType.CLARIFY_OPTION, null, sb.toString()));
+                    sb.append("\t" + (i + 1) + ".\t" + validUserActs.get(i).getDomain() + "\t" + validUserActs.get(i).toString() + "\n");
+                setValueOfState(CLARIFYING_OPTION, sb.toString());
+                setValueOfState(LAST_USER_ACTS, validUserActs);
                 break;
         }
         return systemAct;
@@ -233,8 +256,8 @@ public class Kernel implements IKernel {
                     ArrayList<UserAct> lastUserActs = (ArrayList<UserAct>) globalState.get(LAST_USER_ACTS);
                     if (chosenAct <= lastUserActs.size())
                         systemAct = handle(lastUserActs.get(chosenAct - 1));
-                    globalState.remove(LAST_USER_ACTS);
-                    globalState.remove(CLARIFYING_OPTION);
+                    clearStateIfSet(LAST_USER_ACTS);
+                    clearStateIfSet(CLARIFYING_OPTION);
                     break;
                 case CONFIRM:
 
@@ -248,7 +271,7 @@ public class Kernel implements IKernel {
                     break;
             }
         }
-        lastDomain = systemAct.getDomain();
+        setValueOfState(LAST_DOMAIN,systemAct.getDomain());
         return systemAct;
     }
 
@@ -264,9 +287,9 @@ public class Kernel implements IKernel {
 
                     if (systemAct.getDomain().correspondingContext().hasUnfilledDialElement()) {
                         log.info("[Run]\tPut a new REQ_DIA_ELEMENT " + systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
-                        globalState.put(REQUESTING_DIAL_ELEMENT, systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
+                        setValueOfState(REQUESTING_DIAL_ELEMENT, systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
                     } else {
-                        globalState.put(DOMAIN_FINISHED, lastDomain);
+                        setValueOfState(DOMAIN_FINISHED,getValueOfState(LAST_DOMAIN));
                     }
                     if (!systemAct.getDomain().correspondingContext().hasUnfilledDialElement())
                         tempState = systemAct.getDomain().execute(systemAct);
@@ -281,8 +304,8 @@ public class Kernel implements IKernel {
                     log.info("[Run]\tA new context is created, and now there are " + domains.size() +
                             " domains and " + domainContextHashMap.size() + " contexts");
 
-                    globalState.put(DOMAIN_CREATED, actUnit.value);
-                    globalState.put(REQUESTING_DIAL_ELEMENT, systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
+                   setValueOfState(DOMAIN_CREATED, actUnit.value);
+                    setValueOfState(REQUESTING_DIAL_ELEMENT, systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
                     break;
             }
         }
@@ -305,17 +328,18 @@ public class Kernel implements IKernel {
 
             HashMap tempState = run(systemAct);
 
-            if (lastDomain == Domain.SYSTEM) {
-                systemUtterance.append((String) globalState.get(CLARIFYING_OPTION));
+            if (stateIsSet(CLARIFYING_OPTION)) {
+                systemUtterance.append((String) getValueOfState(CLARIFYING_OPTION));
             } else {
-                if (globalState.containsKey(DOMAIN_CREATED))
-                    systemUtterance.append("I will help you with " + globalState.get(Kernel.DOMAIN_CREATED) + "!\n");
+                if (stateIsSet(DOMAIN_CREATED))
+                    systemUtterance.append("I will help you with " + getValueOfState(Kernel.DOMAIN_CREATED) + "!\n");
+                Domain domain=(Domain) getValueOfState(LAST_DOMAIN);
 
-                log.info("[Work]\t" + lastDomain.getDialStructure().getTask());
-                systemUtterance.append(lastDomain.generate(tempState));
+                log.info("[Work]\t" + domain.getDialStructure().getTask());
+                systemUtterance.append(domain.generate(tempState));
                 // If a context has been closed, reset the current globalState.
-                if (!lastDomain.correspondingContext().hasUnfilledDialElement()) {
-                    domainContextHashMap.remove(lastDomain);
+                if (!domain.correspondingContext().hasUnfilledDialElement()) {
+                    domainContextHashMap.remove(domain);
                     globalState.clear();
                 }
 
