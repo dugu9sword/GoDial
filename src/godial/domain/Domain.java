@@ -12,7 +12,11 @@ import godial.domain.executor.DefaultExecutor;
 import godial.domain.generator.AbstractGenerator;
 import godial.domain.generator.DefaultGenerator;
 import godial.kernel.Kernel;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 
 /**
@@ -20,13 +24,34 @@ import java.util.HashMap;
  */
 public class Domain implements IDomain {
 
-    private String name;
-
+    public static final Domain SYSTEM = new Domain();
+    static Log log = LogFactory.getLog(Domain.class);
     private DialStructure dialStructure;
     private AbstractConverter converter;
     private AbstractGenerator generator;
     private AbstractExecutor executor;
     private Kernel kernel;
+
+    private Domain() {
+    }
+
+    public static Domain newInstance(String path) {
+        try {
+            DialStructure dialStructure = ConfigLoader.loadConfig(path);
+            Domain domain = new Domain();
+            domain.setDialStructure(dialStructure);
+            domain.setConverter(new DefaultConverter());
+            domain.setGenerator(new DefaultGenerator());
+            domain.setExecutor(new DefaultExecutor());
+            log.info("Domain " + path + " is successfully loaded");
+            return domain;
+        } catch (FileNotFoundException e1) {
+            log.error("Config file is not found:\t" + path);
+        } catch (IOException e2) {
+            log.error("The format of config file is illegal:\t" + path);
+        }
+        return null;
+    }
 
     public void setConverter(AbstractConverter converter) {
         this.converter = converter;
@@ -55,10 +80,6 @@ public class Domain implements IDomain {
         return correspondingContext()!=null?true:false;
     }
 
-    private void loadDialStructure(String path) {
-        this.dialStructure = ConfigLoader.loadConfig(path);
-    }
-
     public UserAct convert(String utterance) {
         return converter.convert(utterance);
     }
@@ -75,19 +96,11 @@ public class Domain implements IDomain {
         return dialStructure;
     }
 
-    public Domain(String path) {
-        loadDialStructure(path);
-        setConverter(new DefaultConverter());
-        setGenerator(new DefaultGenerator());
-        setExecutor(new DefaultExecutor());
-        name=path;
+    public void setDialStructure(DialStructure dialStructure) {
+        this.dialStructure = dialStructure;
     }
-
-    private Domain(){}
 
     public String toString(){
-        return name;
+        return getDialStructure().getTask();
     }
-
-    public static final Domain SYSTEM=new Domain();
 }

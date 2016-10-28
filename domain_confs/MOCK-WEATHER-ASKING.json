@@ -1,0 +1,17 @@
+{
+  "task": "MOCK-WEATHER-ASKING",
+  "dialElements": [
+    {
+      "slot": "location",
+      "pattern": "{location}'s weather;{location}=(Beijing|Shanghai|Nanjing)",
+      "required": true,
+      "type": "LOCATION"
+    },
+    {
+      "slot": "day",
+      "pattern": "{day};{day}=(today|tomorrow)",
+      "required": true,
+      "type": "DATE"
+    }
+  ]
+}

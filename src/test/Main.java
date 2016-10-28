@@ -1,17 +1,10 @@
 package test;
 
-import godial.act.ActType;
-import godial.act.ActUnit;
-import godial.act.UserAct;
 import godial.domain.Domain;
 import godial.kernel.Kernel;
-import godial.utils.RegexUtil;
 import org.apache.log4j.PropertyConfigurator;
 
-import java.util.ArrayList;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.regex.Pattern;
 
 
 /**
@@ -22,20 +15,42 @@ public class Main {
         PropertyConfigurator.configure("log4j.properties");
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+
+//        ObjectMapper objectMapper=new ObjectMapper();
+//        String name="MOCK-REMIND-SERVICE";
+//        String x=objectMapper.writeValueAsString(ConfigLoader.loadConfig(name));
+//        PrintWriter printWriter=new PrintWriter("domain_confs/"+name+".json");
+//        printWriter.write(x);
+//        printWriter.close();
+
+//        ObjectMapper objectMapper=new ObjectMapper();
+//        Scanner scanner=new Scanner(new File("domain_confs/MOCK-FLIGHT-BOOKING.json"));
+//        StringBuffer sb=new StringBuffer();
+//        while (scanner.hasNext())
+//            sb.append(scanner.nextLine());
+//
+//        DialStructure dialStructure=objectMapper.readValue(sb.toString(),DialStructure.class);
+//        System.out.print(dialStructure);
 
         Kernel kernel=new Kernel();
 
-        Domain domain1=new Domain("MOCK-FLIGHT-BOOKING");
-        domain1.setExecutor(new FlightBookingExecutor());
-        domain1.setGenerator(new FlightBookingGenerator());
+        String path = "domain_confs/";
 
-        Domain domain2=new Domain("MOCK-WEATHER-ASKING");
-        Domain domain3=new Domain("MOCK-REMIND-SERVICE");
+        Domain domain1 = Domain.newInstance(path + "MOCK-FLIGHT-BOOKING.json");
+        if (domain1 != null) {
+            domain1.setExecutor(new FlightBookingExecutor());
+            domain1.setGenerator(new FlightBookingGenerator());
+            kernel.registerDomain(domain1);
+        }
 
-        kernel.registerDomain(domain1);
-        kernel.registerDomain(domain2);
-        kernel.registerDomain(domain3);
+        Domain domain2 = Domain.newInstance(path + "MOCK-WEATHER-ASKING.json");
+        if (domain2 != null)
+            kernel.registerDomain(domain2);
+
+        Domain domain3 = Domain.newInstance(path + "MOCK-REMIND-SERVICE.json");
+        if (domain3 != null)
+            kernel.registerDomain(domain3);
 
         Scanner scanner=new Scanner(System.in);
         String input;

@@ -20,13 +20,6 @@ import java.util.HashMap;
  */
 public class Kernel implements IKernel {
 
-    static Log log = LogFactory.getLog(Kernel.class);
-
-    private ArrayList<Domain> domains;
-    private HashMap<Domain, Context> domainContextHashMap;
-    private Domain lastDomain;
-    private HashMap globalState;
-
     public static final String LAST_SYSTEM_ACT = "LAST_SYSTEM_ACT";
     public static final String LAST_USER_ACTS = "LAST_USER_ACTS";
     //    public static final String LAST_DOMAIN = "LAST_DOMAIN";
@@ -35,6 +28,11 @@ public class Kernel implements IKernel {
     public static final String CLARIFYING_OPTION = "CLARIFYING_OPTION";
     public static final String DOMAIN_FINISHED = "DOMAIN_FINISHED";
     public static final String CLARIFYING_FLAG = "CLARIFYING_FLAG";
+    static Log log = LogFactory.getLog(Kernel.class);
+    private ArrayList<Domain> domains;
+    private HashMap<Domain, Context> domainContextHashMap;
+    private Domain lastDomain;
+    private HashMap globalState;
 
 
     public Kernel() {

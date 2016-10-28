@@ -1,0 +1,23 @@
+{
+  "task": "MOCK-FLIGHT-BOOKING",
+  "dialElements": [
+    {
+      "slot": "departure",
+      "pattern": "from {departure};{departure}=(Beijing|Shanghai)",
+      "required": true,
+      "type": "LOCATION"
+    },
+    {
+      "slot": "destination",
+      "pattern": "to {destination};{destination}=(Beijing|Shanghai)",
+      "required": true,
+      "type": "LOCATION"
+    },
+    {
+      "slot": "date",
+      "pattern": "(on the {day}th of {month})|(on {month} {day}th);{day}=\\d+,{month}=(May|June|July)",
+      "required": true,
+      "type": "DATE"
+    }
+  ]
+}

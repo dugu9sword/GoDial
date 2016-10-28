@@ -6,13 +6,30 @@ import java.util.ArrayList;
  * Created by zhouyi on 16-10-23.
  */
 public class DialStructure {
+
+    private String task;
     private ArrayList<DialElement> dialElements;
+
+
+    public DialStructure() {
+
+    }
 
     public ArrayList<DialElement> getDialElements() {
         return dialElements;
     }
 
-    public DialStructure(ArrayList<DialElement> dialElements) {
+    public void setDialElements(ArrayList<DialElement> dialElements) {
         this.dialElements = dialElements;
     }
+
+    public String getTask() {
+        return task;
+    }
+
+    public void setTask(String task) {
+        this.task = task;
+    }
+
+
 }
