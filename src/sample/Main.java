@@ -1,4 +1,4 @@
-package test;
+package sample;
 
 import godial.domain.Domain;
 import godial.kernel.Kernel;
@@ -16,22 +16,6 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-
-//        ObjectMapper objectMapper=new ObjectMapper();
-//        String name="MOCK-REMIND-SERVICE";
-//        String x=objectMapper.writeValueAsString(ConfigLoader.loadConfig(name));
-//        PrintWriter printWriter=new PrintWriter("domain_confs/"+name+".json");
-//        printWriter.write(x);
-//        printWriter.close();
-
-//        ObjectMapper objectMapper=new ObjectMapper();
-//        Scanner scanner=new Scanner(new File("domain_confs/MOCK-FLIGHT-BOOKING.json"));
-//        StringBuffer sb=new StringBuffer();
-//        while (scanner.hasNext())
-//            sb.append(scanner.nextLine());
-//
-//        DialStructure dialStructure=objectMapper.readValue(sb.toString(),DialStructure.class);
-//        System.out.print(dialStructure);
 
         Kernel kernel = new Kernel();
 
@@ -58,12 +42,5 @@ public class Main {
             System.out.println("[System]:" + kernel.work(input) + "\n");
             System.out.print("[User]:");
         }
-
-
-//        String p="remind me that {todo};{todo}=(goto)";
-//        Map<String,String> map= RegexUtil.extract("remind me that i will fly to beijing",p);
-//        for (String x:map.keySet()){
-//            System.out.println(x+" = "+map.get(x));
-//        }
     }
 }

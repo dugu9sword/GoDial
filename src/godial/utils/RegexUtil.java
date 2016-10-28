@@ -66,7 +66,7 @@ public class RegexUtil {
     }
 
     /**
-     * This method can be used to test whether a string str contains a pattern regex
+     * This method can be used to sample whether a string str contains a pattern regex
      *
      * @param str
      * @param regex

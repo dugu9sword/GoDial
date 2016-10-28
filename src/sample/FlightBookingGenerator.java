@@ -1,4 +1,4 @@
-package test;
+package sample;
 
 import godial.dialstructure.DialElement;
 import godial.domain.generator.AbstractGenerator;
