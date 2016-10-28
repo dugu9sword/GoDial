@@ -11,6 +11,7 @@ public enum ActType {
     CONFIRM,
     CANCEL,
     SELECT,
+    TRIGGER,
     EXIT,
 
     /**
@@ -19,6 +20,7 @@ public enum ActType {
     GROUND,
     CLARIFY_YES_NO,
     CLARIFY_OPTION,
+    NEW_DOMAIN,
     INFO,
 
     /**

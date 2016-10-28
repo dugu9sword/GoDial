@@ -8,12 +8,17 @@ import java.util.ArrayList;
 public class DialStructure {
 
     private String task;
+    private String trigger;
     private ArrayList<DialElement> dialElements;
 
-
-    public DialStructure() {
-
+    public String getTrigger() {
+        return trigger;
     }
+
+    public void setTrigger(String trigger) {
+        this.trigger = trigger;
+    }
+
 
     public ArrayList<DialElement> getDialElements() {
         return dialElements;

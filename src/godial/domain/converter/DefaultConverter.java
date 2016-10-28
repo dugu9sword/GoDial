@@ -21,11 +21,17 @@ public class DefaultConverter extends AbstractConverter {
     public UserAct convert(String utterance) {
         ArrayList<DialElement> dialElements = getDomain().getDialStructure().getDialElements();
         UserAct userAct = new UserAct();
+
+        if (getDomain().isTriggered(utterance)) {
+            userAct.addActUnit(new ActUnit(ActType.TRIGGER, null, null));
+        }
+
         for (DialElement dialElement : dialElements) {
             HashMap<String, String> map = RegexUtil.extract(utterance, dialElement.pattern);
             if (map != null)
                 userAct.addActUnit(new ActUnit(ActType.INFORM, dialElement.slot, map.toString()));
         }
+
         if (userAct.getActUnits().isEmpty())
             return UserAct.NONE;
         else

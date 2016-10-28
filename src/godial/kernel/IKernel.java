@@ -12,6 +12,8 @@ import java.util.HashMap;
  */
 public interface IKernel {
 
+    void init();
+
     void registerDomain(Domain domain);
 
     HashMap run(SystemAct systemAct);

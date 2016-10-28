@@ -1,5 +1,6 @@
 {
   "task": "MOCK-REMIND-SERVICE",
+  "trigger": "remind",
   "dialElements": [
     {
       "slot": "todo",

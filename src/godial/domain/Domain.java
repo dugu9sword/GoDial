@@ -12,6 +12,7 @@ import godial.domain.executor.DefaultExecutor;
 import godial.domain.generator.AbstractGenerator;
 import godial.domain.generator.DefaultGenerator;
 import godial.kernel.Kernel;
+import godial.utils.RegexUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -51,6 +52,12 @@ public class Domain implements IDomain {
             log.error("The format of config file is illegal:\t" + path);
         }
         return null;
+    }
+
+    public boolean isTriggered(String utterance) {
+        boolean ret = RegexUtil.containsPattern(utterance, getDialStructure().getTrigger());
+        log.info("[Domain]\tThe domain " + getDialStructure().getTask() + (ret ? " is " : " is not ") + "triggered");
+        return ret;
     }
 
     public void setConverter(AbstractConverter converter) {

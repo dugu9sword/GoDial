@@ -1,5 +1,6 @@
 {
   "task": "MOCK-FLIGHT-BOOKING",
+  "trigger": "(flight|fly|plane|airport)",
   "dialElements": [
     {
       "slot": "departure",

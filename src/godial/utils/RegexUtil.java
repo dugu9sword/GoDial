@@ -64,4 +64,15 @@ public class RegexUtil {
             return map;
         } else return null;
     }
+
+    /**
+     * This method can be used to test whether a string str contains a pattern regex
+     *
+     * @param str
+     * @param regex
+     * @return
+     */
+    public static boolean containsPattern(String str, String regex) {
+        return Pattern.compile(regex).matcher(str).find();
+    }
 }

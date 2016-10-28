@@ -1,15 +1,16 @@
 {
   "task": "MOCK-WEATHER-ASKING",
+  "trigger": "weather",
   "dialElements": [
     {
       "slot": "location",
-      "pattern": "{location}'s weather;{location}=(Beijing|Shanghai|Nanjing)",
+      "pattern": "(({location}'s weather)|(weather in {location}));{location}=(Beijing|Shanghai|Nanjing)",
       "required": true,
       "type": "LOCATION"
     },
     {
       "slot": "day",
-      "pattern": "{day};{day}=(today|tomorrow)",
+      "pattern": "(on the {day}th of {month})|(on {month} {day}th);{day}=\\d+,{month}=(May|June|July)",
       "required": true,
       "type": "DATE"
     }
