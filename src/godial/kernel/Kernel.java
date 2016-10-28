@@ -27,7 +27,7 @@ public class Kernel implements IKernel {
     private static final String IS_RESPONDING_TO_SYSTEM = "IS_RESPONDING_TO_SYSTEM";
     private static final String DOMAIN_FINISHED = "DOMAIN_FINISHED";
     private static final String DOMAIN_CREATED = "DOMAIN_CREATED";
-    private static final String LAST_DOMAIN="LAST_DOMAIN";
+    private static final String LAST_DOMAIN = "LAST_DOMAIN";
 
     static Log log = LogFactory.getLog(Kernel.class);
     private ArrayList<Domain> domains;
@@ -55,25 +55,24 @@ public class Kernel implements IKernel {
             globalState.remove(state);
     }
 
-    private void setState(String state){
-        globalState.put(state,null);
+    private void setState(String state) {
+        globalState.put(state, null);
     }
 
-    private void setValueOfState(String state,Object value){
-        if(globalState.containsKey(state))
-            globalState.replace(state,value);
+    private void setValueOfState(String state, Object value) {
+        if (globalState.containsKey(state))
+            globalState.replace(state, value);
         else
-            globalState.put(state,value);
+            globalState.put(state, value);
     }
 
-    private boolean stateIsSet(String state){
+    private boolean stateIsSet(String state) {
         return globalState.containsKey(state);
     }
 
-    private Object getValueOfState(String state){
+    private Object getValueOfState(String state) {
         return globalState.get(state);
     }
-
 
     public void init() {
         if (stateIsSet(DOMAIN_FINISHED)) {
@@ -108,7 +107,7 @@ public class Kernel implements IKernel {
         if (!stateIsSet(LAST_DOMAIN))
             log.info("[Convert]\tLast domain NOT exists");
         else
-            log.info("[Convert]\tLast domain is "+getValueOfState(LAST_DOMAIN));
+            log.info("[Convert]\tLast domain is " + getValueOfState(LAST_DOMAIN));
 
         DialEleType utterType = NameEntityRecognizer.convert(utterance);
         log.info("[Convert]\tName entity is " + utterType);
@@ -121,7 +120,7 @@ public class Kernel implements IKernel {
                 log.info("[Convert]\tCurrently requesting " + utterType);
                 UserAct userAct = new UserAct();
                 // If this statement can be executed, the last domain must have been set in the previous step
-                userAct.setDomain((Domain)getValueOfState(LAST_DOMAIN));
+                userAct.setDomain((Domain) getValueOfState(LAST_DOMAIN));
                 userAct.addActUnit(new ActUnit(ActType.INFORM, dialElement.slot, utterance));
                 userActs.add(userAct);
                 isRespondingToSystem = true;
@@ -162,7 +161,6 @@ public class Kernel implements IKernel {
         clearStateIfSet(REQUESTING_DIAL_ELEMENT);
         clearStateIfSet(CLARIFYING_OPTION);
         clearStateIfSet(CLARIFYING_YES_OR_NO);
-        clearStateIfSet(LAST_USER_ACTS);
 
         return userActs;
     }
@@ -180,7 +178,7 @@ public class Kernel implements IKernel {
         if (!stateIsSet(LAST_DOMAIN))
             log.info("[React]\tLast domain NOT exists");
         else
-            log.info("[React]\tLast domain is "+getValueOfState(LAST_DOMAIN));
+            log.info("[React]\tLast domain is " + getValueOfState(LAST_DOMAIN));
 
         if (stateIsSet(IS_RESPONDING_TO_SYSTEM)) {
             return handle(userActs.get(0));
@@ -216,7 +214,7 @@ public class Kernel implements IKernel {
                 systemAct.setDomain(Domain.SYSTEM);
                 // the first userAct in the list will be the most preferred
                 validUserActs.sort((UserAct o2, UserAct o1) -> {
-                    Domain lastDomain=(Domain)globalState.get(LAST_DOMAIN);
+                    Domain lastDomain = (Domain) getValueOfState(LAST_DOMAIN);
                     if (o1.getDomain() == lastDomain)
                         return 1;
                     else if (o2.getDomain() == lastDomain)
@@ -253,11 +251,10 @@ public class Kernel implements IKernel {
                     break;
                 case SELECT:
                     int chosenAct = Integer.parseInt(actUnit.value);
-                    ArrayList<UserAct> lastUserActs = (ArrayList<UserAct>) globalState.get(LAST_USER_ACTS);
+                    ArrayList<UserAct> lastUserActs = (ArrayList<UserAct>) getValueOfState(LAST_USER_ACTS);
                     if (chosenAct <= lastUserActs.size())
                         systemAct = handle(lastUserActs.get(chosenAct - 1));
                     clearStateIfSet(LAST_USER_ACTS);
-                    clearStateIfSet(CLARIFYING_OPTION);
                     break;
                 case CONFIRM:
 
@@ -268,10 +265,14 @@ public class Kernel implements IKernel {
                 case TRIGGER:
                     if (!userAct.getDomain().hasCorrespondingContext())
                         systemAct.addActUnit(new ActUnit(ActType.NEW_DOMAIN, null, systemAct.getDomain().getDialStructure().getTask()));
+                    else if (systemAct.getDomain().correspondingContext().hasUnfilledDialElement()) {
+                        log.info("[Handle]\tPut a new REQ_DIA_ELEMENT " + systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
+                        setValueOfState(REQUESTING_DIAL_ELEMENT, systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
+                    }
                     break;
             }
         }
-        setValueOfState(LAST_DOMAIN,systemAct.getDomain());
+        setValueOfState(LAST_DOMAIN, systemAct.getDomain());
         return systemAct;
     }
 
@@ -289,14 +290,10 @@ public class Kernel implements IKernel {
                         log.info("[Run]\tPut a new REQ_DIA_ELEMENT " + systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
                         setValueOfState(REQUESTING_DIAL_ELEMENT, systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
                     } else {
-                        setValueOfState(DOMAIN_FINISHED,getValueOfState(LAST_DOMAIN));
+                        setValueOfState(DOMAIN_FINISHED, getValueOfState(LAST_DOMAIN));
                     }
                     if (!systemAct.getDomain().correspondingContext().hasUnfilledDialElement())
                         tempState = systemAct.getDomain().execute(systemAct);
-                    break;
-                case CLARIFY_OPTION:
-//                    globalState.put(CLARIFYING_OPTION,actUnit.value);
-//                    globalState.put(LAST_USER_ACTS,)
                     break;
                 case NEW_DOMAIN:
                     Context context = new Context(systemAct.getDomain().getDialStructure());
@@ -304,7 +301,7 @@ public class Kernel implements IKernel {
                     log.info("[Run]\tA new context is created, and now there are " + domains.size() +
                             " domains and " + domainContextHashMap.size() + " contexts");
 
-                   setValueOfState(DOMAIN_CREATED, actUnit.value);
+                    setValueOfState(DOMAIN_CREATED, actUnit.value);
                     setValueOfState(REQUESTING_DIAL_ELEMENT, systemAct.getDomain().correspondingContext().nextUnfilledDialElement());
                     break;
             }
@@ -333,7 +330,7 @@ public class Kernel implements IKernel {
             } else {
                 if (stateIsSet(DOMAIN_CREATED))
                     systemUtterance.append("I will help you with " + getValueOfState(Kernel.DOMAIN_CREATED) + "!\n");
-                Domain domain=(Domain) getValueOfState(LAST_DOMAIN);
+                Domain domain = (Domain) getValueOfState(LAST_DOMAIN);
 
                 log.info("[Work]\t" + domain.getDialStructure().getTask());
                 systemUtterance.append(domain.generate(tempState));

@@ -32,7 +32,7 @@ public class Main {
         if (domain2 != null) {
             domain2.setExecutor(new WeatherAskingExecutor());
             domain2.setGenerator(new WeatherAskingGenerator());
-            kernel.registerDomain (domain2);
+            kernel.registerDomain(domain2);
         }
 
         Domain domain3 = Domain.newInstance(path + "MOCK-REMIND-SERVICE.json");
