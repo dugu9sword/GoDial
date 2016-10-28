@@ -1,7 +1,5 @@
 package godial.domain.generator;
 
-import godial.act.SystemAct;
-
 import java.util.HashMap;
 
 /**

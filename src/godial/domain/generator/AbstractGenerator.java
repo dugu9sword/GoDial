@@ -8,11 +8,11 @@ import godial.domain.Domain;
 public abstract class AbstractGenerator implements IGenerator {
     private Domain domain;
 
-    public void setDomain(Domain domain) {
-        this.domain = domain;
-    }
-
     public Domain getDomain() {
         return domain;
+    }
+
+    public void setDomain(Domain domain) {
+        this.domain = domain;
     }
 }

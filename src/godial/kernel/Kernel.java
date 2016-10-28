@@ -57,9 +57,9 @@ public class Kernel implements IKernel {
         /**
          * If the user has not responsed to the request for clarification, clear the flag.
          */
-        if(globalState.containsKey(CLARIFYING_OPTION) && !globalState.containsKey(CLARIFYING_FLAG))
-            globalState.put(CLARIFYING_FLAG,null);
-        else if(globalState.containsKey(CLARIFYING_FLAG)) {
+        if (globalState.containsKey(CLARIFYING_OPTION) && !globalState.containsKey(CLARIFYING_FLAG))
+            globalState.put(CLARIFYING_FLAG, null);
+        else if (globalState.containsKey(CLARIFYING_FLAG)) {
             globalState.remove(CLARIFYING_OPTION);
             globalState.remove(CLARIFYING_FLAG);
             globalState.remove(LAST_USER_ACTS);
@@ -179,7 +179,7 @@ public class Kernel implements IKernel {
                 StringBuffer sb = new StringBuffer();
                 sb.append("Sorry, but what do you mean? You may select one of the following options:\n");
                 for (int i = 0; i < validUserActs.size(); i++)
-                    sb.append("\t"+ (i+1) + ".\t" + validUserActs.get(i).getDomain() +"\t"+validUserActs.get(i).toString()+"\n");  //  TODO: How to represent user act?
+                    sb.append("\t" + (i + 1) + ".\t" + validUserActs.get(i).getDomain() + "\t" + validUserActs.get(i).toString() + "\n");  //  TODO: How to represent user act?
                 globalState.put(CLARIFYING_OPTION, sb.toString());
                 globalState.put(LAST_USER_ACTS, validUserActs);
                 lastDomain = Domain.SYSTEM;
@@ -226,7 +226,7 @@ public class Kernel implements IKernel {
     }
 
     public HashMap run(SystemAct systemAct) {
-        HashMap tempState=null;
+        HashMap tempState = null;
         ArrayList<ActUnit> actUnits = systemAct.getActUnits();
         for (ActUnit actUnit : actUnits) {
             switch (actUnit.actType) {
@@ -241,8 +241,8 @@ public class Kernel implements IKernel {
                     } else {
                         globalState.put(DOMAIN_FINISHED, lastDomain);
                     }
-                    if(!systemAct.getDomain().correspondingContext().hasUnfilledDialElement())
-                        tempState=systemAct.getDomain().execute(systemAct);
+                    if (!systemAct.getDomain().correspondingContext().hasUnfilledDialElement())
+                        tempState = systemAct.getDomain().execute(systemAct);
                     break;
                 case CLARIFY_OPTION:
 //                    globalState.put(CLARIFYING_OPTION,actUnit.value);
@@ -250,7 +250,7 @@ public class Kernel implements IKernel {
                     break;
             }
         }
-        return tempState==null?new HashMap():tempState;
+        return tempState == null ? new HashMap() : tempState;
 
     }
 
@@ -266,7 +266,7 @@ public class Kernel implements IKernel {
         String systemUtterance;
 
         if (systemAct != SystemAct.NONE) {
-            HashMap tempState=run(systemAct);
+            HashMap tempState = run(systemAct);
 
             if (lastDomain == Domain.SYSTEM) {
                 systemUtterance = (String) globalState.get(CLARIFYING_OPTION);

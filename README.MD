@@ -22,3 +22,6 @@ For more information, you may refer to https://www.zybuluo.com/dugu9sword/note/5
 - `commons-lang3-3.5`
 - `commons-logging-1.2`
 - `log4j-1.2.17`
+- `jackson-annotations-2.8.4`
+- `jackson-core-2.8.4`
+- `jackson-databind-2.8.4`

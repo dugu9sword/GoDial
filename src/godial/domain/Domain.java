@@ -63,8 +63,8 @@ public class Domain implements IDomain {
         generator.setDomain(this);
     }
 
-    public void setExecutor(AbstractExecutor executor){
-        this.executor=executor;
+    public void setExecutor(AbstractExecutor executor) {
+        this.executor = executor;
         executor.setDomain(this);
     }
 
@@ -72,12 +72,12 @@ public class Domain implements IDomain {
         this.kernel = kernel;
     }
 
-    public Context correspondingContext(){
+    public Context correspondingContext() {
         return kernel.getContextByDomain(this);
     }
 
-    public boolean hasCorrespondingContext(){
-        return correspondingContext()!=null?true:false;
+    public boolean hasCorrespondingContext() {
+        return correspondingContext() != null ? true : false;
     }
 
     public UserAct convert(String utterance) {
@@ -100,7 +100,7 @@ public class Domain implements IDomain {
         this.dialStructure = dialStructure;
     }
 
-    public String toString(){
+    public String toString() {
         return getDialStructure().getTask();
     }
 }

@@ -33,7 +33,7 @@ public class Main {
 //        DialStructure dialStructure=objectMapper.readValue(sb.toString(),DialStructure.class);
 //        System.out.print(dialStructure);
 
-        Kernel kernel=new Kernel();
+        Kernel kernel = new Kernel();
 
         String path = "domain_confs/";
 
@@ -52,10 +52,10 @@ public class Main {
         if (domain3 != null)
             kernel.registerDomain(domain3);
 
-        Scanner scanner=new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
         String input;
-        while (!(input=scanner.nextLine()).equals("bye")){
-            System.out.println("[System]:"+kernel.work(input)+"\n");
+        while (!(input = scanner.nextLine()).equals("bye")) {
+            System.out.println("[System]:" + kernel.work(input) + "\n");
             System.out.print("[User]:");
         }
 

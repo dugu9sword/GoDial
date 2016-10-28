@@ -1,7 +1,5 @@
 package godial.act;
 
-import godial.dialstructure.DialElement;
-
 /**
  * Created by zhouyi on 16-10-23.
  */

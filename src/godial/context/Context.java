@@ -18,13 +18,13 @@ public class Context {
 
     private HashMap<String, String> values;
 
-    public DialStructure getDialStructure() {
-        return dialStructure;
-    }
-
     public Context(DialStructure dialStructure) {
         this.dialStructure = dialStructure;
         values = new HashMap<>();
+    }
+
+    public DialStructure getDialStructure() {
+        return dialStructure;
     }
 
     public void setSlot(String slot, String value) {
@@ -38,8 +38,8 @@ public class Context {
         return null;
     }
 
-    public boolean hasUnfilledDialElement(){
-        return nextUnfilledDialElement()!=null;
+    public boolean hasUnfilledDialElement() {
+        return nextUnfilledDialElement() != null;
     }
 
     public HashMap<String, String> getValues() {

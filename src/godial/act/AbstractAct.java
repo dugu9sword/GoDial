@@ -24,18 +24,18 @@ public class AbstractAct {
         return actUnits;
     }
 
-    public void setDomain(Domain domain) {
-        this.domain = domain;
-    }
-
     public Domain getDomain() {
         return domain;
     }
 
-    public String toString(){
-        String ret=getClass().getName()+" ";
-        for(ActUnit actUnit:actUnits)
-            ret+=actUnit.toString()+" ";
+    public void setDomain(Domain domain) {
+        this.domain = domain;
+    }
+
+    public String toString() {
+        String ret = getClass().getName() + " ";
+        for (ActUnit actUnit : actUnits)
+            ret += actUnit.toString() + " ";
         return ret;
     }
 }

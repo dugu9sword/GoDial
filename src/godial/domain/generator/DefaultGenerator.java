@@ -1,6 +1,5 @@
 package godial.domain.generator;
 
-import godial.act.SystemAct;
 import godial.dialstructure.DialElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,21 +14,21 @@ import java.util.HashMap;
  * Created by zhouyi on 16-10-23.
  */
 public class DefaultGenerator extends AbstractGenerator {
-    static Log log= LogFactory.getLog(DefaultGenerator.class);
+    static Log log = LogFactory.getLog(DefaultGenerator.class);
 
     public String generate(HashMap map) {
 
         if (getDomain().correspondingContext().nextUnfilledDialElement() == null) {
             String s = "OK! I will do that for you.\n";
             ArrayList<DialElement> dialElements = getDomain().getDialStructure().getDialElements();
-            HashMap<String,String> values=getDomain().correspondingContext().getValues();
-            for (DialElement dialElement:dialElements)
-                s += "- \t\t"+dialElement.slot + "\t" + values.get(dialElement.slot) + "\n";
+            HashMap<String, String> values = getDomain().correspondingContext().getValues();
+            for (DialElement dialElement : dialElements)
+                s += "- \t\t" + dialElement.slot + "\t" + values.get(dialElement.slot) + "\n";
             s += "Anything else?";
             return s;
         } else {
-            DialElement unfilled=getDomain().correspondingContext().nextUnfilledDialElement();
-            return "Ok, what is the " +unfilled .slot +" (of "+ getDomain() + ")?";
+            DialElement unfilled = getDomain().correspondingContext().nextUnfilledDialElement();
+            return "Ok, what is the " + unfilled.slot + " (of " + getDomain() + ")?";
         }
     }
 }

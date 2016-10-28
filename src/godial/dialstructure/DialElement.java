@@ -9,18 +9,18 @@ public class DialElement {
     public boolean required;
     public DialEleType type;
 
-    public DialElement(String slot, String pattern, boolean required,DialEleType type) {
+    public DialElement(String slot, String pattern, boolean required, DialEleType type) {
         this.slot = slot;
         this.pattern = pattern;
         this.required = required;
-        this.type=type;
+        this.type = type;
     }
 
     public DialElement() {
 
     }
 
-    public String toString(){
-        return "slot: "+slot+"\ttype: "+type+"\trequired: "+required;
+    public String toString() {
+        return "slot: " + slot + "\ttype: " + type + "\trequired: " + required;
     }
 }

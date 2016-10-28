@@ -11,7 +11,7 @@ import java.util.HashMap;
 /**
  * Created by zhouyi on 16-10-23.
  */
-public interface IDomain extends IConverter, IGenerator,IExecutor {
+public interface IDomain extends IConverter, IGenerator, IExecutor {
     UserAct convert(String utterance);
 
     String generate(HashMap map);

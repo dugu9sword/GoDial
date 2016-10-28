@@ -13,11 +13,11 @@ import java.util.HashMap;
 public class FlightBookingExecutor extends AbstractExecutor {
     @Override
     public HashMap execute(SystemAct systemAct) {
-        Context context=systemAct.getDomain().correspondingContext();
-        HashMap map= context.getValues();
-        JOptionPane.showMessageDialog(null,"You are booking a flight ticket, the price is 88 dollars.\n\n"+map);
-        HashMap ret=new HashMap();
-        ret.put("price",88);
+        Context context = systemAct.getDomain().correspondingContext();
+        HashMap map = context.getValues();
+        JOptionPane.showMessageDialog(null, "You are booking a flight ticket, the price is 88 dollars.\n\n" + map);
+        HashMap ret = new HashMap();
+        ret.put("price", 88);
         return ret;
     }
 }
