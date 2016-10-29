@@ -37,8 +37,11 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
         String input;
+
+        System.out.println("[System]:Hello, what can i do for you?\n");
+        System.out.print("[User]:");
         while (!(input = scanner.nextLine()).equals("bye")) {
-            System.out.println("[System]:" + kernel.work(input) + "\n");
+            System.out.println("\n[System]:" + kernel.work(input)+"\n");
             System.out.print("[User]:");
         }
     }

@@ -15,6 +15,8 @@ It is designed to perform dialogue management tasks, and features are listed as 
 
 Below is a sample of the GoDial. Two domains are defined, which are flight-booking and weather-checking.
 
+You can run the sample by `java -jar godial.jar`.
+
 In the dialogue, the user wants to book a flight ticket. During the process he asks another question about Beijing's weather. The system responds to the user correctly. Then, the dialogue switches back to the flight-booking domain, and the user books a ticket successfully.
 
 Compared with [OpenDial](http://www.opendial-toolkit.net/), the GoDial framework has the following advantages:
