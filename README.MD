@@ -15,47 +15,40 @@ It is designed to perform dialogue management tasks, and features are listed as 
 
 Below is a sample of the GoDial. Two domains are defined, which are flight-booking and weather-checking.
 
-In the dialogue, the user wants to book a flight ticket. During the  he asks another question: about Beijing's weather. The system responds to the user correctly, and tells the user about the weather. Then, the dialogue switches back to the flight-booking domain, and the user books a ticket successfully.
-
-```
-[User]:Hello
-[System]:Hello, what can i do for you?
-
-[User]:I want to book a flight ticket
-[System]:I will help you with MOCK-FLIGHT-BOOKING!
-Ok, what is the departure of MOCK-FLIGHT-BOOKING?
-
-[User]:Shanghai
-[System]:Ok, what is the destination of MOCK-FLIGHT-BOOKING?
-
-[User]:By the way, what is the weather in Beijing?
-[System]:I will help you with MOCK-WEATHER-ASKING!
-Ok, what is the date of MOCK-WEATHER-ASKING?
-
-[User]:on June 5th
-[System]:Sorry, but what do you mean? You may select one of the following options:
-	1.	MOCK-WEATHER-ASKING	godial.act.UserAct INFORM date {month=June, day=5} 
-	2.	MOCK-FLIGHT-BOOKING	godial.act.UserAct INFORM date {month=June, day=5} 
-
-[User]:1
-[System]:The weather in {location=Beijing} on {month=June, day=5} is sunny
-
-[User]:thanks
-[System]:Hello, what can i do for you?
-
-[User]:I want to go to Beijing on June 8th
-[System]:I have helped you book a ticket, the price is 57
-
-[User]:bye
-```
-
-## Comparison
+In the dialogue, the user wants to book a flight ticket. During the process he asks another question about Beijing's weather. The system responds to the user correctly. Then, the dialogue switches back to the flight-booking domain, and the user books a ticket successfully.
 
 Compared with [OpenDial](http://www.opendial-toolkit.net/), the GoDial framework has the following advantages:
 
 - In the OpenDial, the user will have to follow restricted steps designed by the system manager. For example, if you want to book a ticket, you must firstly input the `department`, secondly the `destination`, and thirdly the `date`. You can not **rearrange** or **combine** different steps, such as `On June 8th, I want to fly to Beijing from Shanghai`.
 - In the OpenDial, the user cannot process multiple tasks at the same time, i.e., before you have completed a `flight-booking` task, you cannot start an `music-playing` task, that can be very inconvenient.
 
+
+```
+[User]:hello
+[System]:Hello, what can i do for you?
+
+[User]:I want to book a flight ticket
+[System]:I will help you with MOCK-FLIGHT-BOOKING!
+Ok, what is the departure of MOCK-FLIGHT-BOOKING?
+
+[User]:I'd like to fly to Shanghai from Beijing
+[System]:Ok, what is the date of MOCK-FLIGHT-BOOKING?
+
+[User]:Excuse me, but what is Beijing's weather?
+[System]:I will help you with MOCK-WEATHER-ASKING!
+Ok, what is the date of MOCK-WEATHER-ASKING?
+
+[User]:on June 7th
+[System]:The weather in {location=Beijing} on {month=June, day=7} is sunny
+
+[User]:ok, I'll fly on June 7th
+[System]:I have helped you book a ticket, the price is 20
+
+[User]:thanks
+[System]:Hello, what can i do for you?
+
+[User]:bye
+```
 
 
 ## Architecture

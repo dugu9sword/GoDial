@@ -35,10 +35,6 @@ public class Main {
             kernel.registerDomain(domain2);
         }
 
-        Domain domain3 = Domain.newInstance(path + "MOCK-REMIND-SERVICE.json");
-        if (domain3 != null)
-            kernel.registerDomain(domain3);
-
         Scanner scanner = new Scanner(System.in);
         String input;
         while (!(input = scanner.nextLine()).equals("bye")) {

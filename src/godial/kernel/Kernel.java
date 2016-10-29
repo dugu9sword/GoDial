@@ -27,6 +27,7 @@ public class Kernel implements IKernel {
     private static final String IS_RESPONDING_TO_SYSTEM = "IS_RESPONDING_TO_SYSTEM";
     private static final String DOMAIN_FINISHED = "DOMAIN_FINISHED";
     private static final String DOMAIN_CREATED = "DOMAIN_CREATED";
+    private static final String DOMAIN_TRIGGERED="DOMAIN_TRIGGERED";
     private static final String LAST_DOMAIN = "LAST_DOMAIN";
 
     static Log log = LogFactory.getLog(Kernel.class);
@@ -151,6 +152,9 @@ public class Kernel implements IKernel {
 
         if (!isRespondingToSystem) {
             for (Domain domain : domains) {
+                if(domain.isTriggered(utterance)){
+                    setValueOfState(DOMAIN_TRIGGERED,domain);
+                }
                 UserAct userAct = domain.convert(utterance);
                 userAct.setDomain(domain);
                 userActs.add(userAct);
@@ -171,6 +175,14 @@ public class Kernel implements IKernel {
      * The second case is that the domain has corresponding context.
      * If both of the above are not satisfied, the user act will be ignored.
      *
+     * When several domains have the ability to produce the user act, we will choose the most probable one,
+     * the priority of user act is listed as follows:
+     *
+     * 1. The domain is clearly triggered in the utterance. E.g., if the keyword "flight" occurs in the utterance, we will
+     * select the "flight-booking" domain.
+     * 2. The domain is the last used one, since the context of a dialogue is always continuous.
+     * 3. Otherwise, we will let the user choose a domain.
+     *
      * @param userActs
      * @return
      */
@@ -185,14 +197,30 @@ public class Kernel implements IKernel {
         }
 
         ArrayList<UserAct> validUserActs = new ArrayList<>();
-        for (UserAct userAct : userActs) {
-            boolean isTriggered = false;
-            for (ActUnit actUnit : userAct.getActUnits())
-                if (actUnit.actType == ActType.TRIGGER)
-                    isTriggered = true;
-            if (isTriggered || userAct.getDomain().hasCorrespondingContext() && userAct != UserAct.NONE)
-                validUserActs.add(userAct);
+
+        if(stateIsSet(DOMAIN_TRIGGERED)){
+            Domain triggeredDomain=(Domain) getValueOfState(DOMAIN_TRIGGERED);
+            for(UserAct userAct:userActs)
+                if(userAct.getDomain()==triggeredDomain)
+                    validUserActs.add(userAct);
+            clearStateIfSet(DOMAIN_TRIGGERED);
         }
+        else if(stateIsSet(LAST_DOMAIN)){
+            Domain lastDomain=(Domain)getValueOfState(LAST_DOMAIN);
+            for (UserAct userAct:userActs)
+                if(userAct.getDomain()==lastDomain && userAct!=UserAct.NONE)
+                    validUserActs.add(userAct);
+        }
+        if(validUserActs.isEmpty())
+            for (UserAct userAct : userActs) {
+                boolean isTriggered = false;
+                for (ActUnit actUnit : userAct.getActUnits())
+                    if (actUnit.actType == ActType.TRIGGER)
+                        isTriggered = true;
+                if (isTriggered || userAct.getDomain().hasCorrespondingContext() && userAct != UserAct.NONE)
+                    validUserActs.add(userAct);
+            }
+
 
 
         log.info("[React]\tTotally " + validUserActs.size() + " valid user acts, they are " + validUserActs);
